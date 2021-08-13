@@ -7,8 +7,9 @@ import cv2
 # crosswalk : (194,225,108)
 
 seg_color = [[0, 0, 0], [6, 154, 78], [128, 128, 128], [108, 225, 194]]
-seg_img = cv2.imread('seg_map_v2_short.png')
-test_img = cv2.imread('testimg.png')
+seg_img = cv2.imread('../src/seg_map_v2_short.png')
+# test_img = cv2.imread('../src/testimg.png')
+
 
 class GridArray:
     def __init__(self, k, shape, seg_img):
@@ -19,17 +20,17 @@ class GridArray:
 
         for y in range(self.y):
             for x in range(self.x):
-                print('y:',y)
+                print('y:', y)
                 print('x:', x)
                 Y = y * (k + 1)
                 X = x * (k + 1)
                 unique, counts = np.unique(seg_img[Y:Y + k, X:X + k], return_counts=True, axis=1)
                 seg_num = list(unique[np.argmax(counts)][0])
-                cv2.imshow('point',seg_img[Y:Y + k, X:X + k])
-                test = cv2.rectangle(seg_img,(X,Y),(X+k,Y+k),(0,0,255),-1)
-                cv2.imshow('test',test)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    cv2.destroyAllWindows()
+                # cv2.imshow('point', seg_img[Y:Y + k, X:X + k])
+                # test = cv2.rectangle(seg_img, (X, Y), (X + k, Y + k), (0, 0, 255), -1)
+                # cv2.imshow('test', test)
+                # if cv2.waitKey(1) & 0xFF == ord('q'):
+                #     cv2.destroyAllWindows()
                 self.grid_seg_env[y, x] = seg_color.index(seg_num)
 
     def update(self, coords, clss):
@@ -54,7 +55,7 @@ shape = (745, 800, 3)
 
 ga = GridArray(k, shape, seg_img)
 
-cv2.destroyAllWindows()
+#cv2.destroyAllWindows()
 
 for i in ga.grid_seg_env:
     print(*i, sep=' ')
