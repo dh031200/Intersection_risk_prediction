@@ -6,4 +6,10 @@
 
 210813 - DH edits
 - grid_array.py: 확인용 시각화코드 삭제
-- src 디렉토리: 소스코드에 필요한 이미지들 저장 (seg_map_v2_short.png 
+- src 디렉토리: 소스코드에 필요한 이미지들 저장 (seg_map_v2_short.png)
+
+210825 - BJ edits
+- func_grid_matching.py: 객체 트래킹 후 그리드에 맵핑하는 작업을 수행하는 함수
+- ---> 현재 트래킹 까지완료
+- ---> To do: 트래킹 성능 고도화 (객체별로 사람->사람 트래킹)
+- ---> To do: 각 객체 그리드 맵핑
