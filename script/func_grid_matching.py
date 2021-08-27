@@ -10,8 +10,11 @@ from os import listdir
 from os.path import isfile, join
 import natsort
 from numpy.linalg import norm
+import cv2
 
 from load_json import log_read
+
+from func_init_grid import GridArray
 
 # %% Functions
 
@@ -42,8 +45,69 @@ def get_speed(ref_object_info, cur_object_info):
     # calculating with FPS, SAIMPLEING_RATE, and K
 
     return pixel_dist / FPS
-# %% log data loading and extract objects' infromation by frame
 
+
+def get_object_behaivor(obj_ref_frame_label, obj_ref_frame_axies, obj_cur_frame_label, obj_cur_frame_axies):
+
+    ref_len = len(obj_ref_frame_label)
+    ref_cur = len(obj_cur_frame_label)
+
+    obj_behavior_set = dict()
+
+    speed_set = []
+
+    if ref_len != 0:
+
+        for ref_trace_index in range(0, ref_len):
+            ref_object_id = obj_ref_frame_label[ref_trace_index]
+            ref_object_info = obj_ref_frame_axies[ref_trace_index]
+
+            # # get_grid
+            # grid_matching_time = time.time()
+            # grid_coord = ga.update([ref_object_info], ['person'])
+            # print("Grid matching time ",
+            #       time.time() - grid_matching_time)
+
+            obj_match_flag = False
+
+            for cur_trace_index in range(0, ref_cur):
+                cur_object_id = obj_cur_frame_label[cur_trace_index]
+
+                if ref_object_id == cur_object_id:
+                    obj_match_flag = True
+
+                    cur_object_info = obj_cur_frame_axies[cur_trace_index]
+
+                    # get_speed
+                    object_speed = get_speed(
+                        ref_object_info, cur_object_info)
+
+                    break
+
+            if not obj_match_flag:
+                print("test")
+                print(object_speed)
+                object_speed = 0
+                print("???")
+
+            speed_set.append(object_speed)
+            # print(speed_set)
+
+        obj_behavior_set["speed"] = speed_set
+
+    return obj_behavior_set
+
+
+# %% Grid initialization
+seg_color = [[0, 0, 0], [6, 154, 78], [128, 128, 128], [108, 225, 194]]
+seg_img = cv2.imread('../src/seg_map_v2_short.png')
+
+k = 15
+shape = (745, 800, 3)
+
+ga = GridArray(k, shape, seg_img)
+
+# %% log data loading and extract objects' infromation by frame
 
 FPS = 10
 SAMPLING_RATE = 10
@@ -144,42 +208,17 @@ for frame_index in range(0, len_dat):
     # XX_cur_frame_label: current frame information
 
     # ID 부여 (?), 속도, 방향 추출
+    person_obj_behavior = get_object_behaivor(person_ref_frame_label, person_ref_frame_axies,
+                                              person_cur_frame_label, person_cur_frame_axies)
 
-    ref_len = len(person_ref_frame_label)
-    ref_cur = len(person_cur_frame_label)
+    car_obj_behavior = get_object_behaivor(car_ref_frame_label, car_ref_frame_axies,
+                                           car_cur_frame_label, car_cur_frame_axies)
 
-    if ref_len != 0:
+    labels = len(person_ref_frame_axies) * ['person']
+    person_ref_frame_grid = ga.update(person_ref_frame_axies, labels)
 
-        for ref_trace_index in range(0, ref_len):
-            ref_object_id = person_ref_frame_label[ref_trace_index]
-
-            for cur_trace_index in range(0, ref_cur):
-                cur_object_id = person_cur_frame_label[cur_trace_index]
-
-                if ref_object_id == cur_object_id:
-                    # print("ref_object_id", ref_object_id)
-                    # print("cur_object_id", cur_object_id)
-                    # print("ref_trace_index", ref_trace_index)
-                    # print("cur_trace_index", cur_trace_index)
-                    # print("===================")
-
-                    ref_object_info = person_ref_frame_axies[ref_trace_index]
-                    cur_object_info = person_cur_frame_axies[cur_trace_index]
-
-                    # print("ref_object_info", ref_object_info)
-                    # print("cur_object_info", cur_object_info)
-
-                    # get_speed
-                    object_speed = get_speed(ref_object_info, cur_object_info)
-                    print(object_speed)
-
-                    # get_heading
-
-                    # get_grid
-
-                    # set_traced_object_info
-
-                    #target_object_info = person_ref_frame_axies[target_object_index]
+    labels = len(car_ref_frame_axies) * ['car']
+    car_ref_frame_grid = ga.update(car_ref_frame_axies, labels)
 
     if frame_index == 10:
         break
