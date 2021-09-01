@@ -10,19 +10,22 @@ import natsort
 
 # %%
 
-log_dir = 'logs_by_frame'
 
-log_files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
-log_files = natsort.natsorted(log_files)
+def log_read(log_dir):
+    #log_dir = 'logs_by_frame'
 
-log_dat = []
+    log_files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
+    log_files = natsort.natsorted(log_files)
 
-for file_index in range(0, len(log_files)):
+    log_dat = []
 
-    file_path = join(log_dir, log_files[file_index])
+    for file_index in range(0, len(log_files)):
 
-    tmp_dat = open(file_path, 'r').read()
-    tmp_dat = json.loads(tmp_dat)
+        file_path = join(log_dir, log_files[file_index])
 
-    log_dat.append(tmp_dat)
+        tmp_dat = open(file_path, 'r').read()
+        tmp_dat = json.loads(tmp_dat)
 
+        log_dat.append(tmp_dat)
+
+    return log_dat
