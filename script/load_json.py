@@ -29,3 +29,5 @@ def log_read(log_dir):
         log_dat.append(tmp_dat)
 
     return log_dat
+
+# %%

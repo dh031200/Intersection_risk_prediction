@@ -7,68 +7,63 @@ import cv2
 # car road: (128,128,128)
 # crosswalk : (194,225,108)
 
-seg_color = [[0, 0, 0], [6, 154, 78], [128, 128, 128], [108, 225, 194]]
-seg_img = cv2.imread('../src/seg_map_v2_short.png')
-# test_img = cv2.imread('../src/testimg.png')
+class setGrid:
 
+    def __init__(self, num_cells, virtual_img_size):
+        self.num_cells = num_cells
 
-class GridArray:
-    def __init__(self, k, shape, seg_img):
-        self.origin_shape = shape
-        self.x, self.y = int(shape[1] / (k + 1)), int(shape[0] / (k + 1))
-        self.grid_array = np.full((self.y, self.x, 1), 0, np.uint8)
-        self.grid_seg_env = np.full((self.y, self.x, 1), 0, np.uint8)
+        # width == height in all cases
+        self.virtual_img_width = virtual_img_size[0] = 1000
+        self.virtual_img_height = virtual_img_size[1] = 1000
 
-        for y in range(self.y):
-            for x in range(self.x):
-                #print('y:', y)
-                #print('x:', x)
-                Y = y * (k + 1)
-                X = x * (k + 1)
-                unique, counts = np.unique(
-                    seg_img[Y:Y + k, X:X + k], return_counts=True, axis=1)
-                seg_num = list(unique[np.argmax(counts)][0])
-                # cv2.imshow('point', seg_img[Y:Y + k, X:X + k])
-                # test = cv2.rectangle(seg_img, (X, Y), (X + k, Y + k), (0, 0, 255), -1)
-                # cv2.imshow('test', test)
-                # if cv2.waitKey(1) & 0xFF == ord('q'):
-                #     cv2.destroyAllWindows()
-                self.grid_seg_env[y, x] = seg_color.index(seg_num)
+        self.grid_array = np.full(
+            (self.num_cells * self.num_cells), 0, np.uint8)
 
-    def update(self, coords, clss):
-        grid_list = []
+        self.grid_pixel_ratio = float(self.virtual_img_width / self.num_cells)
+
+        # self.grid_index = 0
+
+    def get_grid_from_coord(self, coords, clss):
+
+        base_boundary = [0, 0, self.grid_pixel_ratio, self.grid_pixel_ratio]
+        # print(base_boundary)
+        # print(self.grid_pixel_ratio)
+
+        # break_flag = False
+        grid_index = 0
+
+        rs_grid_list = []
 
         for coord, cls in zip(coords, clss):
-            if coord[1] < 0 or coord[1] >= self.origin_shape[1] or coord[0] < 0 or coord[0] >= self.origin_shape[0]:
-                continue
-            if cls == 'person':
-                i_cls = 1
-            elif cls == 'car':
-                i_cls = 2
-            else:
-                continue
+            # print(coord)
+            break_flag = False
+            for horizon_shift_index in range(0, self.num_cells):
+                target_X = coord[0] - \
+                    self.grid_pixel_ratio * horizon_shift_index
 
-            y = int(coord[0] / (k + 1))
-            x = int(coord[1] / (k + 1))
-            #print('y: ', y)
-            #print('x: ', x)
+                # if target_X < base_boundary[0]:
+                #    grid_index = 0
+                #    break
 
-            self.grid_array[y, x] = i_cls
+                if (base_boundary[0] <= target_X) and (target_X <= base_boundary[2]):
 
-            grid_list.append((x, y))
+                    for vertical_shift_index in range(0, self.num_cells):
+                        target_Y = coord[1] - \
+                            self.grid_pixel_ratio * vertical_shift_index
 
-        return grid_list
-# %%
+                        if target_Y < base_boundary[1]:
+                            grid_index = 0
+                            break_flag = True
 
+                        if (base_boundary[1] <= target_Y) and (target_Y <= base_boundary[3]):
+                            grid_index = horizon_shift_index + vertical_shift_index * self.num_cells
+                            # rs_grid_list.append(grid_index)
+                            break_flag = True
+                            break
 
-k = 15
-shape = (745, 800, 3)
+                if break_flag:
+                    break
 
-ga = GridArray(k, shape, seg_img)
+            rs_grid_list.append(grid_index)
 
-# cv2.destroyAllWindows()
-
-for i in ga.grid_seg_env:
-    print(*i, sep=' ')
-
-# %%
+        return rs_grid_list

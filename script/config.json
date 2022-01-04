@@ -1,0 +1,60 @@
+{
+	"EXEC_CONFIG": {
+		"WORKSPACE": "../NAVIBOX_sample_video",
+		"WORKSPACE": "../NAVIBOX_full_video",
+		"SAMPLING_RATE": 5,
+		"PED_MIN_DISTANCE": 20,
+		"CAR_MIN_DISTANCE": 40,
+		"K": 10,
+		"P": 10,
+		"TIME_FLAG_LEG": 5,
+		"DIFF_FRAME": 100
+	},
+	"SIGNAL_CONFIG": {
+		"SetMode_01": 1,
+		"RiskLevel_01": 1,
+		"RiskLevel_02": 2,
+		"RiskLevel_03": 3,
+		"RiskLevel_04": 4,
+		"RiskLevel_05": 5,
+		"RiskLevel_06": 6
+	},
+	"SITE_CONFIG": {
+		"ORIGIN_IMG_COODR_1": {
+			"X": 18, 
+			"Y": 45
+		},
+		"ORIGIN_IMG_COODR_2": {
+			"X": 269, 
+			"Y": 34
+		},
+		"ORIGIN_IMG_COODR_3": {
+			"X": 498, 
+			"Y": 276
+		},
+		"ORIGIN_IMG_COODR_4": {
+			"X": 96, 
+			"Y": 365
+		},
+		"VIRTUAL_IMG_COODR": {
+			"MIN": 0, 
+			"MAX": 500
+		},
+		"CRWK_ROI": {
+			"X1": 140, 
+			"Y1": 36, 
+			"X2": 271, 
+			"Y2": 217
+		},
+		"GRID_CELL": 100,
+		"VIRTUAL_IMG_SIZE": 500
+	},
+	"RISK_REG_CONFIG": {
+		"HISTORY_QUEUE_SIZE":  15,
+		"PREDICTION_QUEUE_SIZE": 15,
+		"RISK_1_DIST": 100,
+		"RISK_2_DIST": 70,
+		"RISK_3_DIST": 50
+	}
+}
+
